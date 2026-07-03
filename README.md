@@ -32,10 +32,10 @@ After pushing to `main`, enable Pages in GitHub:
 4. Set `Branch` to `main` and the folder to `/ (root)`.
 5. Save and wait for GitHub Pages to publish.
 
-The site will be available at:
+The site is configured for:
 
 ```text
-https://andruwsorensen.github.io/Telegraph/
+https://telegraph.andruwsorensen.com/
 ```
 
 ## Project Structure
