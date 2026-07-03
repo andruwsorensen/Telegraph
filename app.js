@@ -89,7 +89,9 @@ const els = {
   textInput: document.querySelector("#textInput"),
   encodedOutput: document.querySelector("#encodedOutput"),
   playText: document.querySelector("#playText"),
+  enableSound: document.querySelector("#enableSound"),
   telegraphKey: document.querySelector("#telegraphKey"),
+  manualMode: document.querySelector(".manual-mode"),
   morseReferenceGrid: document.querySelector("#morseReferenceGrid"),
   currentCode: document.querySelector("#currentCode"),
   decodedOutput: document.querySelector("#decodedOutput"),
@@ -156,6 +158,38 @@ async function ensureAudio() {
   }
 
   return state.audioContext.state === "running";
+}
+
+async function enableSound() {
+  els.enableSound.disabled = true;
+  els.audioStatus.textContent = "Enabling sound";
+
+  if (!(await ensureAudio())) {
+    els.enableSound.disabled = false;
+    return false;
+  }
+
+  const now = state.audioContext.currentTime;
+  const oscillator = state.audioContext.createOscillator();
+  const gain = state.audioContext.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.value = Number(els.tone.value);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.18, now + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+  oscillator.connect(gain);
+  gain.connect(state.audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + 0.18);
+  oscillator.onended = () => {
+    oscillator.disconnect();
+    gain.disconnect();
+  };
+
+  els.audioStatus.textContent = "Audio ready";
+  els.enableSound.textContent = "Test sound";
+  els.enableSound.disabled = false;
+  return true;
 }
 
 async function toneOn() {
@@ -362,6 +396,7 @@ els.letterGap.addEventListener("input", () => {
   }
 });
 els.dashCutoff.addEventListener("input", updateControls);
+els.enableSound.addEventListener("click", enableSound);
 els.playText.addEventListener("click", playMorse);
 els.clearManual.addEventListener("click", () => {
   clearManualTimers();
@@ -396,6 +431,14 @@ if (window.PointerEvent) {
   els.telegraphKey.addEventListener("mouseup", handleKeyEnd);
   els.telegraphKey.addEventListener("mouseleave", handleKeyEnd);
 }
+
+els.manualMode.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+});
+
+els.manualMode.addEventListener("selectstart", (event) => {
+  event.preventDefault();
+});
 
 window.addEventListener("keydown", (event) => {
   if (event.code !== "Space" || event.repeat) return;

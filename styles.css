@@ -32,6 +32,9 @@ body {
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
 }
 
 button,
@@ -126,6 +129,18 @@ h2 {
   font-weight: 800;
 }
 
+.audio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.audio-controls button {
+  white-space: nowrap;
+}
+
 .controls {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -187,6 +202,9 @@ textarea {
   font-size: 1.08rem;
   line-height: 1.45;
   outline: none;
+  user-select: text;
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
 }
 
 textarea:focus,
@@ -232,10 +250,17 @@ button:focus-visible {
 }
 
 .readout.split,
+.manual-mode,
+.manual-mode *,
 .morse-reference,
 .manual-hint {
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.manual-mode {
+  touch-action: manipulation;
 }
 
 .morse-reference {
@@ -431,6 +456,15 @@ button:focus-visible {
   .mode-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .audio-controls {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .audio-controls .status {
+    text-align: center;
   }
 
   .controls label {
