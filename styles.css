@@ -231,11 +231,19 @@ button:focus-visible {
   margin-top: auto;
 }
 
+.readout.split,
+.morse-reference,
+.manual-hint {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .morse-reference {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fffdf8;
   padding: 12px;
+  touch-action: manipulation;
 }
 
 .reference-title {
@@ -386,6 +394,7 @@ button:focus-visible {
   color: var(--muted);
   font-size: 0.9rem;
   font-weight: 700;
+  touch-action: manipulation;
 }
 
 .manual-hint span {

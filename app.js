@@ -72,6 +72,8 @@ const state = {
   letterTimer: 0,
   wordTimer: 0,
   playing: false,
+  audioPrimed: false,
+  toneRequestId: 0,
 };
 
 const els = {
@@ -118,7 +120,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function ensureAudio() {
+async function ensureAudio() {
   if (!AudioContextClass) {
     els.audioStatus.textContent = "Audio unavailable";
     return false;
@@ -132,20 +134,39 @@ function ensureAudio() {
   }
 
   if (state.audioContext.state === "suspended") {
-    const resume = state.audioContext.resume();
-    if (resume) {
-      resume.catch(() => {
-        els.audioStatus.textContent = "Tap to enable audio";
-      });
+    try {
+      await state.audioContext.resume();
+    } catch {
+      els.audioStatus.textContent = "Tap to enable audio";
+      return false;
     }
   }
 
-  return true;
+  if (state.audioContext.state !== "running") {
+    els.audioStatus.textContent = "Tap to enable audio";
+    return false;
+  }
+
+  if (!state.audioPrimed) {
+    const source = state.audioContext.createBufferSource();
+    source.buffer = state.audioContext.createBuffer(1, 1, state.audioContext.sampleRate);
+    source.connect(state.gain);
+    source.start(0);
+    state.audioPrimed = true;
+  }
+
+  return state.audioContext.state === "running";
 }
 
-function toneOn() {
-  if (!ensureAudio()) return;
-  if (state.oscillator) return;
+async function toneOn() {
+  if (state.oscillator) return true;
+
+  const requestId = ++state.toneRequestId;
+  if (!(await ensureAudio())) return false;
+
+  if (requestId !== state.toneRequestId || (!state.isPressed && !state.playing)) {
+    return false;
+  }
 
   const now = state.audioContext.currentTime;
   state.oscillator = state.audioContext.createOscillator();
@@ -156,9 +177,11 @@ function toneOn() {
   state.gain.gain.cancelScheduledValues(now);
   state.gain.gain.setTargetAtTime(0.24, now, 0.006);
   els.audioStatus.textContent = "Signal on";
+  return true;
 }
 
 function toneOff() {
+  state.toneRequestId += 1;
   if (!state.audioContext || !state.oscillator) return;
 
   const oscillator = state.oscillator;
@@ -277,7 +300,7 @@ function releaseKey() {
 
 async function playSymbol(symbol, unit) {
   if (symbol === ".") {
-    toneOn();
+    await toneOn();
     await sleep(unit);
     toneOff();
     await sleep(unit);
@@ -285,7 +308,7 @@ async function playSymbol(symbol, unit) {
   }
 
   if (symbol === "-") {
-    toneOn();
+    await toneOn();
     await sleep(unit * 3);
     toneOff();
     await sleep(unit);
