@@ -57,6 +57,9 @@ const FROM_MORSE = Object.fromEntries(
   Object.entries(MORSE).map(([character, code]) => [code, character]),
 );
 
+const MIN_MANUAL_LETTER_GAP_UNITS = 6;
+const MANUAL_WORD_GAP_EXTRA_UNITS = 4;
+
 const state = {
   audioContext: null,
   oscillator: null,
@@ -100,6 +103,14 @@ function letterGapUnits() {
 
 function wordGapUnits() {
   return Math.max(7, letterGapUnits() + 4);
+}
+
+function manualLetterGapUnits() {
+  return Math.max(MIN_MANUAL_LETTER_GAP_UNITS, letterGapUnits());
+}
+
+function manualWordGapUnits() {
+  return manualLetterGapUnits() + MANUAL_WORD_GAP_EXTRA_UNITS;
 }
 
 function sleep(ms) {
@@ -226,8 +237,8 @@ function commitWordGap() {
 function scheduleManualDecode() {
   clearManualTimers();
   const unit = dotMs();
-  state.letterTimer = setTimeout(commitLetter, unit * letterGapUnits());
-  state.wordTimer = setTimeout(commitWordGap, unit * wordGapUnits());
+  state.letterTimer = setTimeout(commitLetter, unit * manualLetterGapUnits());
+  state.wordTimer = setTimeout(commitWordGap, unit * manualWordGapUnits());
 }
 
 function pressKey() {
