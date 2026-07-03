@@ -22,16 +22,6 @@ Because the app uses the Web Audio API, audio starts after a button press or key
 
 ## GitHub Pages
 
-This repo is ready to publish directly from the `main` branch root with GitHub Pages.
-
-After pushing to `main`, enable Pages in GitHub:
-
-1. Open the repository on GitHub.
-2. Go to `Settings` -> `Pages`.
-3. Set `Source` to `Deploy from a branch`.
-4. Set `Branch` to `main` and the folder to `/ (root)`.
-5. Save and wait for GitHub Pages to publish.
-
 The site is configured for:
 
 ```text
