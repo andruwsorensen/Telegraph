@@ -59,6 +59,7 @@ const FROM_MORSE = Object.fromEntries(
 
 const MIN_MANUAL_LETTER_GAP_UNITS = 6;
 const MANUAL_WORD_GAP_EXTRA_UNITS = 4;
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 
 const state = {
   audioContext: null,
@@ -118,20 +119,32 @@ function sleep(ms) {
 }
 
 function ensureAudio() {
+  if (!AudioContextClass) {
+    els.audioStatus.textContent = "Audio unavailable";
+    return false;
+  }
+
   if (!state.audioContext) {
-    state.audioContext = new AudioContext();
+    state.audioContext = new AudioContextClass();
     state.gain = state.audioContext.createGain();
     state.gain.gain.value = 0;
     state.gain.connect(state.audioContext.destination);
   }
 
   if (state.audioContext.state === "suspended") {
-    state.audioContext.resume();
+    const resume = state.audioContext.resume();
+    if (resume) {
+      resume.catch(() => {
+        els.audioStatus.textContent = "Tap to enable audio";
+      });
+    }
   }
+
+  return true;
 }
 
 function toneOn() {
-  ensureAudio();
+  if (!ensureAudio()) return;
   if (state.oscillator) return;
 
   const now = state.audioContext.currentTime;
@@ -334,14 +347,32 @@ els.clearManual.addEventListener("click", () => {
   setManualOutputs();
 });
 
-els.telegraphKey.addEventListener("pointerdown", (event) => {
+function handleKeyStart(event) {
   event.preventDefault();
-  els.telegraphKey.setPointerCapture(event.pointerId);
+  if (event.pointerId !== undefined) {
+    els.telegraphKey.setPointerCapture(event.pointerId);
+  }
   pressKey();
-});
-els.telegraphKey.addEventListener("pointerup", releaseKey);
-els.telegraphKey.addEventListener("pointercancel", releaseKey);
-els.telegraphKey.addEventListener("pointerleave", releaseKey);
+}
+
+function handleKeyEnd(event) {
+  event.preventDefault();
+  releaseKey();
+}
+
+if (window.PointerEvent) {
+  els.telegraphKey.addEventListener("pointerdown", handleKeyStart);
+  els.telegraphKey.addEventListener("pointerup", handleKeyEnd);
+  els.telegraphKey.addEventListener("pointercancel", handleKeyEnd);
+  els.telegraphKey.addEventListener("pointerleave", handleKeyEnd);
+} else {
+  els.telegraphKey.addEventListener("touchstart", handleKeyStart, { passive: false });
+  els.telegraphKey.addEventListener("touchend", handleKeyEnd, { passive: false });
+  els.telegraphKey.addEventListener("touchcancel", handleKeyEnd, { passive: false });
+  els.telegraphKey.addEventListener("mousedown", handleKeyStart);
+  els.telegraphKey.addEventListener("mouseup", handleKeyEnd);
+  els.telegraphKey.addEventListener("mouseleave", handleKeyEnd);
+}
 
 window.addEventListener("keydown", (event) => {
   if (event.code !== "Space" || event.repeat) return;
