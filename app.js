@@ -194,7 +194,7 @@ function setManualOutputs() {
 }
 
 function buildMorseReference() {
-  const referenceCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const referenceCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   els.morseReferenceGrid.innerHTML = "";
 
   for (const character of referenceCharacters) {

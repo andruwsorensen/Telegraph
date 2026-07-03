@@ -274,12 +274,10 @@ button:focus-visible {
 }
 
 .reference-code {
-  overflow: hidden;
   color: var(--ink);
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
