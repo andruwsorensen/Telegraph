@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegraph</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel hero" aria-labelledby="title">
+        <div>
+          <p class="eyebrow">Morse telegraph</p>
+          <h1 id="title">Telegraph</h1>
+        </div>
+        <div class="status" id="audioStatus">Audio ready</div>
+      </section>
+
+      <section class="panel controls" aria-label="Playback controls">
+        <label>
+          <span>Speed</span>
+          <input id="wpm" type="range" min="6" max="28" value="14" />
+          <output id="wpmValue">14 WPM</output>
+        </label>
+        <label>
+          <span>Tone</span>
+          <input id="tone" type="range" min="320" max="920" value="620" />
+          <output id="toneValue">620 Hz</output>
+        </label>
+        <label>
+          <span>Letter gap</span>
+          <input id="letterGap" type="range" min="2" max="8" value="3" />
+          <output id="letterGapValue">3 units</output>
+        </label>
+        <label>
+          <span>Manual dash</span>
+          <input id="dashCutoff" type="range" min="140" max="520" value="260" />
+          <output id="dashCutoffValue">260 ms</output>
+        </label>
+      </section>
+
+      <section class="workspace">
+        <article class="panel mode" aria-labelledby="automaticTitle">
+          <div class="mode-header">
+            <div>
+              <p class="eyebrow">Automatic</p>
+              <h2 id="automaticTitle">Write text, then play Morse</h2>
+            </div>
+            <button id="playText" class="primary" type="button">Play</button>
+          </div>
+
+          <textarea
+            id="textInput"
+            spellcheck="false"
+            placeholder="Type a message..."
+          >HELLO WORLD</textarea>
+
+          <div class="readout">
+            <span>Code</span>
+            <output id="encodedOutput">.... . .-.. .-.. --- / .-- --- .-. .-.. -..</output>
+          </div>
+        </article>
+
+        <article class="panel mode" aria-labelledby="manualTitle">
+          <div class="mode-header">
+            <div>
+              <p class="eyebrow">Manual</p>
+              <h2 id="manualTitle">Press the key to write</h2>
+            </div>
+            <button id="clearManual" type="button">Clear</button>
+          </div>
+
+          <div class="morse-reference" aria-label="Morse code key">
+            <div class="reference-title">
+              <span>Morse key</span>
+              <span>Letters and numbers</span>
+            </div>
+            <div id="morseReferenceGrid" class="reference-grid"></div>
+          </div>
+
+          <button id="telegraphKey" class="telegraph-key" type="button" aria-label="Telegraph key">
+            <span class="key-top"></span>
+            <span class="key-arm"></span>
+            <span class="key-base"></span>
+          </button>
+
+          <div class="manual-hint">
+            <span>Tap for dot</span>
+            <span>Hold for dash</span>
+            <span>Spacebar works too</span>
+          </div>
+
+          <div class="readout split">
+            <div>
+              <span>Current letter</span>
+              <output id="currentCode"></output>
+            </div>
+            <div>
+              <span>Decoded text</span>
+              <output id="decodedOutput"></output>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
